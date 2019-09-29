@@ -93,4 +93,4 @@ Our model would be represented as:
 * In the absence of a socialization period, ratings are, on average, `r abs(mod1.summ$coefficients[[1]])`
 * When a socialization period is present, employee satisfaction ratings are expected to be `r abs(mod1.summ$coefficients[[2]])` points higher than those who do not receive one; a difference of about `r perc.diff` 
 * If we were to accurately replicate this experiment, there is a 95% chance that the change in ratings from the addition of a socialization period is between `r cints[1]` and `r cints[2]`
-* Our model explains about `r mod1.summ$r.squared` of the variance in quantity sold
+* Our model explains about `r mod1.summ$r.squared` of the variance in employee satistfaction ratings
