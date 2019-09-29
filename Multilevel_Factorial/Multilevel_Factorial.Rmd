@@ -297,7 +297,7 @@ We can get measures of effect size for both the random effects (ICC's) and fixed
 * `Marginal` - % variance in AUC explained by only Sex and Group variables
 * `Conditional` - % explained variance by Sex, Group, and individual differences
 
-To find the effect sizes for each set of parameters, we can use the custom function `lmer_effects`.
+To find the effect sizes for each set of parameters, we can use the included custom function: `lmer_effects`
 
 ```{r}
 ### Find effect sizes

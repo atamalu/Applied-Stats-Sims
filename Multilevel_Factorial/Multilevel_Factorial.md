@@ -479,7 +479,7 @@ effect sizes of model 2 would be interpreted as such:
     differences
 
 To find the effect sizes for each set of parameters, we can use the
-custom function `lmer_effects`.
+included custom function: `lmer_effects`
 
 ``` r
 ### Find effect sizes
