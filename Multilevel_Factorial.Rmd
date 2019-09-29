@@ -4,6 +4,7 @@ output:
   github_document:
     html_preview: true
 ---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "Figures/")
@@ -13,32 +14,42 @@ options(digits = 3,
 
 ## Study
 
-A behavioral neuroscience lab that studies learned helplessness is testing a new technology which measures calcium activity in the brain. One previous study tested the effect of exercise on activity in the medial prefrontal cortex (mPFC) in response to stress. However, this study only used male subjects. The present lab has previously discovered that neural activity in the mPFC resulting from stressful situations is different between male and female rats. Additionally, activity was measured using a different technology. Therefore, one researcher decides to test if exercise will alter aggregate calcium levels in this region and affect how the mPFC reacts to uncontrollable stress.
+A behavioral neuroscience lab that studies learned helplessness is testing a new technology that measures calcium activity in the brain. One previous study tested the effect of exercise on activity in the medial prefrontal cortex (mPFC) in response to an uncontrollable stressor. However, this study only included male subjects. The present lab has previously discovered that neural activity in the mPFC resulting from stressful situations is different between male and female rats. One researcher decides to test if exercise will alter aggregate calcium levels in this region and affect how the mPFC reacts to uncontrollable stress.
 
-For 6 weeks beforehand, an experimental group (exercise) is given a wheel to run on in their cage. A control (sedentary) group is also given a wheel to run on for this time period, but it is locked and therefore non-functional. The researcher also includes subjects of both sexes. To connect behavior and neural activity during the experiment, calcium activity is continuously recorded before and through 30 trials of inescapable shock (IS); in which the subject does not have behavioral control over the stressor. 
+For 6 weeks beforehand, an experimental group (exercise) is given a wheel to run on in their cage. A control group (sedentary) is also given a wheel to run on for this time period, but it is locked and therefore non-functional. The researcher also includes subjects of both sexes. To connect behavior and neural activity during the experiment, calcium activity is continuously recorded before and through 30 trials of inescapable shock (IS); in which the subject does not have behavioral control over the stressor. 
 
-The data is first centered at baseline, then aggregated to remove the dimension of time within trials. This is accomplished by using the area under the curve (AUC) to compact time and aggregate calcium levels into one measurement. This use of the AUC metric is representing aggregate levels of calcium relative to the pre-trial baseline. To be specific, this makes the interpretation of AUCs: "mPFC activity over the course of shock relative to pre-trial baseline."
+The data is first centered at a pre-trial baseline period, then aggregated to remove the dimension of time within trials. This is accomplished by using the area under the curve (AUC) to compact time and aggregate calcium levels into one measurement. This use of the AUC metric is representing aggregate levels of calcium relative to the pre-trial baseline. To be specific, this makes the interpretation of AUCs: "mPFC activity over the course of shock relative to pre-trial baseline," which essentially makes it a measure of how uncontrollable stress changes neural activity.
 
 ## Why this model?
 
 The reasoning behind using a multilevel model is pretty straightforward in this case:
 
 * Due to individual differences in stress resilience and overall neurobiology, we at least assume that we should give each subject their own intercept
-* We want to consider any potential change in activity that occurs over trials in case of a trend or sudden drop/increase. So we should construct a model to measure if Trial is a significant predictor of AUC. We should also add a random slope across Trials for each individual; allowing the change across trials to differ between subjects
+* Also because of individual differences in stress resilience, the rate at which the DV changes across trials in response to stress may differ from subject to subject (assuming that it does change across trials). So we see if allowing a random slope for Trial will significantly improve the model
+
+<details><summary>(details)</summary>
+<p>
+Multilevel models (aka hierarchical or mixed-effect models) are becoming increasingly popular for both hypothesis testing and predictive purposes. This is in-part because it allows us make inferences on the individual level. Furhter, unlike a standard repeated-measures ANOVA, multilevel models permit a large number of repetitions without blocking trials and losing statistical power, in addition to a large amount of potentially useful information. 
+
+These models can capitalize on experimental designs with many repeated observations for each subject. By telling the model that each observation pertains to a certain individual, we can make stronger inferences than standard ANOVAs by also examining how predictor variables affect <i>individuals</i> in a group. This is extremely helpful in fields where you do not have the luxury of using many subjects or participants, but the experiment gives many data points for each subject.
+
+For example: instead of simply saying that a grouping variable explains 32% of variance in the dependent variable (DV), we can also compute the amount of variance that the grouping variable accounts for on the individual level. We can then use this information to strengthen our inferences about the experimental variable(s). So if overall between-subject differences account for 45% of the variance here, we can also assume that around 3/4 of individual differences in the DV can be explained by that grouping variable.
+</p></details>
 
 ## Setup
 
 ### Packages/functions
-```{r}
-suppressMessages(library(kableExtra)) # table options
-suppressMessages(library(dplyr)) # data manipulation
-suppressMessages(library(psych)) # some analytics
-suppressMessages(library(ggplot2)) # visualization
-suppressMessages(library(ggpubr)) # good theme
-suppressMessages(library(lme4)) # mixed model
-suppressMessages(library(lmerTest)) # p-values for lme4
-suppressMessages(library(optimx)) # optimizer
-suppressMessages(library(performance)) # effect sizes
+
+```{r, message=FALSE}
+library(kableExtra) # table options
+library(dplyr) # data manipulation
+library(psych) # some analytics
+library(ggplot2) # visualization
+library(ggpubr) # good theme
+library(lme4) # mixed model
+library(lmerTest) # p-values for lme4
+library(optimx) # optimizer
+library(performance) # effect sizes
 
 set.seed(150) # for data simulation replicability
 theme_set(theme_pubr() %+replace%
@@ -116,9 +127,9 @@ Now we have our data set. Each combination of group and sex (IV's) has 10 subjec
 
 We start by making a summary frame grouped by Group and Sex from our simulated data.
 
-<details><summary>Click for explanation</summary>
+<details><summary>(details)</summary>
 <p>
-A bar graph is a very basic and ubiquitous method of displaying categorical data. Here, the bars represent the means of our grouping variables. Error bars featuring the standard error (SE) are often added to these bars to give an idea of how well the sample means from our study represent the population; with longer error bars indicating less certainty.
+Bar graphs are a very basic and ubiquitous way of displaying categorical predictors with a continuous response. Here, the bars represent the means of the factorial combination of grouping variables. Error bars featuring the standard error (SE) are often added to these bars to give an idea of how well the sample means from our study represent the population; with longer error bars indicating less certainty.
 </p></details>
 <BR>
 
@@ -147,14 +158,13 @@ ggplot(df.summ1) +
        y = 'AUC',
        title = 'Average Calcium Levels during Shock',
        subtitle = 'with standard errors')
-
 ```
 
 There is clearly a difference in averages between males and females. The graph suggests that there may be an effect of exercise, but it is relatively small if it is.
 
 Next, we move to the between-subject individual level by making a summary data frame from our original data. This data frame will be grouped by Group, Sex, and Subject number.
 
-<details><summary>Click for explanation</summary>
+<details><summary>(details)</summary>
 <p>
 The graph itself - a box plot - shows the minimum, 25th percentile, median, 75th percentile, and maximum. In a broader sense, the box represents individuals within the middle 50% of values by group. The lines extending from the box represent the extremes. Adding data points allows us to look at how average DV values for each individual are distributed.
 </p></details>
@@ -178,14 +188,13 @@ ggplot(df.summ2) +
   geom_point(aes(x = Group2, y = Mean)) +
   labs(x = 'Sex', y = 'AUC',
        title = '')
-
 ```
 
 We then work our way down to the within-subject individual level by using the original data and plotting subjects across all trials. In practice, we want to look at all of the subjects. But for this example, we will look at the first 4 subjects in each group to avoid an overwhelming amount of visuals.
 
-<details><summary>Click for explanation</summary>
+<details><summary>(details)</summary>
 <p>
-We can use facets to conveniently view subjects along all trials. Viewing them in this manner helps find any trends that may occur across trials within subjects, or any abrupt increases or decreases in calcium levels. In the event of a trend, we can easily see if that trend differs between groups. While the change across trials is not one of the main hypotheses, but it is something that could affect the results. 
+We can use facets to conveniently view subjects along all trials. Viewing them in this manner helps find any trends that may occur across trials within subjects, or any abrupt increases or decreases in calcium levels. In the event of a trend, we can then easily see if that trend differs between groups. While the change across trials is not one of the main hypotheses, individual differences in this trend is something that could affect the results. 
 </p></details>
 <BR>
 
@@ -203,18 +212,11 @@ ggplot(df.sub) +
        title = '') +
   facet_grid(Subject.num ~ Group2) +
   scale_x_continuous(breaks = c(10, 20, 30))
-
 ```
 
 There is no specific trend across trials that is noticeable in any group. This is not necessarily surprising; as the manipulation does not involve any learning effect or mid-trial alteration in any experimental manner.
 
 ## Pre-model
-
-Before we construct this model, we must first add a column that has each individual subject. If we simply input the group subject number, R may incorrectly specify our random effects. 
-
-```{r}
-df$Subject <- paste0('S', rep(1:48, 30))
-```
 
 The last step of preparation is constructing the contrast codes. Specifically, we want to know:
 
@@ -241,6 +243,10 @@ To construct our model, we begin at a random intercept model by including the fo
 We also use ML instead of REML for estimation to measure the effects of our individual parameters by using model comparison.
 
 ```{r}
+### Unique subject ids for random effects specification
+df$Subject <- paste0('S', rep(1:48, 30))
+
+### Model
 mod1 <- lmer(AUC ~ (1 | Subject) + group.con + sex.con + group.con:sex.con, data = df, REML = FALSE, control = lmer.opts) # ML for model comparisons
 print(summary(mod1))
 ```
@@ -248,7 +254,7 @@ print(summary(mod1))
 Next, we check to see if our model is significantly improved by allowing the change in AUC across trials from uncontrollable stress to be different for each subject. We expect that it does not because of our visual inspection above.
 
 ```{r}
-mod2 <- lmer(AUC ~ Trial + (1 + Trial|Subject) + group.con + sex.con + group.con:sex.con, data = df, REML = FALSE, control = lmer.opts)
+mod2 <- lmer(AUC ~ (1 + Trial|Subject) + group.con + sex.con + group.con:sex.con, data = df, REML = FALSE, control = lmer.opts)
 ```
 
 We receive a message that tells us our fit is singular. This is the result of either the variance captured by a random effect being close to 0, or a correlation of +/- 1. A look at the random effects confirms that the added slope of Trial is our culprit:
@@ -259,7 +265,7 @@ summary(mod2)$varcor
 
 So we leave the OMNIBUS model without a slope that can vary within subjects across trials. Keep in mind that this still considers all 30 observations from the same subject, it just does not consider the within-subject changes <i>across</i> trials.
 
-We are now ready to move to the main analysis portion of the modeling process. To perform comparisons, we create 4 models; with each one (minus the most complex model) excluding a variable of interest.
+We are now ready to move to the main analysis portion of the modeling process. To perform comparisons, we create 4 models; each one (minus the most complex model) excluding a variable of interest.
 
 ## Model comparisons
 
@@ -332,8 +338,6 @@ We will only work with the model comparisons. Although full model effect sizes a
 
 #### Random intercept 
 
-Each subject has 30 observations. Standard repeated-measure ANOVA models render time measurements as categorical variables. This is often not plausible; as there would be an extremely large amount of comparisons. Because of this, you will often see designs where the trials are blocked into sets of 5, 10, etc. 
-
 So how much variance is accounted for by individual differences?
 
 ```{r}
@@ -353,7 +357,7 @@ Now we can measure the statistical significance of mean differences between grou
 
 #### Interaction
 
-Our main hypothesis was that, unlike past evidence in males, female subjects in the exercise group would result in a different the degree of mPFC activity than those that did not exercise. So we start by comparing the most complex model with the model missing only the interaction.
+Our main hypothesis was that mPFC activity in female subjects that exercise would be lower than those who did not, unlike in males. So we start by comparing the most complex model with the model missing only the interaction.
 
 ```{r}
 int.comp <- comp_lmer_mods(mod2, mod1)
@@ -410,9 +414,7 @@ kable(sex.comp)
 A subject's sex is a significant predictor of change in mPFC activity from pre-trial baseline, as a result of uncontrollable stress.
 
 ### Tables and visuals
-
-
-
+ 
 ```{r}
 mod.comps <- as.data.frame(mod.comps)
 ##### Create labels --------------
@@ -420,7 +422,27 @@ comp.labs <- c('Group x Sex',
                'Exercise - Sedentary',
                'Female - Male')
 mod.comps$Comp.labs <- factor(comp.labs, levels = comp.labs)
+```
 
+First, we graph the difference between group means for each hypothesis we tested.
+
+<details><summary>(details)</summary>
+<p>
+The horizontal orientation of the mean difference graph emphasizes that we are looking at the <i>difference</i> between contrasts. So "Female - Male" literally means subtracting the mean of males from the mean of females. The extending bars represent the 95% confidence interval of these differences. That is, if we were to successfully replicate this study under identical conditions, there is a 95% chance that the difference between those 2 group means would be within that range.
+</p></details>
+
+```{r include=FALSE}
+##### Add labels and theme --------------
+labs.theme <- theme(
+    axis.title.x = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid.minor.x = element_line(color = 'gray96'),
+    panel.grid.major.x = element_line(color = 'gray96'),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.text.x = element_text(face = 'bold'),
+    axis.text.y = element_text(face = 'bold')
+  )
 ```
 
 ```{r}
@@ -433,43 +455,38 @@ results.plot <- ggplot(mod.comps) +
   scale_x_discrete(labels = mod.comps$Comp.labs,
                    breaks = mod.comps$Comp.labs,
                    limits = rev(mod.comps$Comp.labs)) +
-  coord_flip()
-
-##### Add labels and theme --------------
-results.plot <- results.plot + 
+  coord_flip() +
   labs(x = '', y = 'Mean Difference',
     title = 'Contrasts of Mean Differences',
-    subtitle = 'with confidence intervals') +
-  theme(
-    axis.title.x = element_blank(),
-    axis.ticks = element_blank(),
-    panel.grid.minor.x = element_line(color = 'gray96'),
-    panel.grid.major.x = element_line(color = 'gray96'),
-    panel.grid.minor.y = element_blank(),
-    panel.grid.major.y = element_blank(),
-    axis.text.x = element_text(face = 'bold'),
-    axis.text.y = element_text(face = 'bold')
-  )
+    subtitle = 'with 95% confidence intervals') +
+  labs.theme
 
 results.plot
 ```
 
-Graph of predicted means for individuals
+Last, we visualize how close each subject's predicted value from our model is to their actual values across trials. This can be easily done by using a similar graph across trials from earlier. Each red line represents the predicted AUC for the respective subject, which does not change across trials. 
 
 ```{r}
+##### New labels ---------------
+df$Group2 <- paste(df$Group, df$Sex)
+df.sub <- df[df$Subject.num %in% c(1:4),]
 
-#df.title <- 'Subject means and predicted values'
+df$Group2 <- factor(df$Group2, levels=grps.ordered)
+df$pred <- predict(mod2)
 
-#df$pred <- predict(mod2)
+df.sub <- df[df$Subject.num %in% c(1:4),] ### subset
 
-#df.sub <- df %>%
-#  group_by(Group, Sex, Subject.num) %>%
-#  summarize(mn = mean(AUC),
-#            se = se(AUC),
-#            mn.pred <- mean(AUC))
-
-#ggplot(df.sub) +
-#  geom_point(aes(x = Group, y = AUC))
-
-# lil
+##### Graph ---------------
+ggplot(df.sub) +
+  geom_line(aes(x = Trial, y = pred),
+            color = 'red', size = 1) +
+  geom_point(aes(x = Trial, y = AUC),
+             alpha = 0.3) +
+  labs(x = 'Trial', y = 'AUC',
+       title = 'Subject AUCs by Trial',
+       subtitle = 'with predicted subject means') +
+  facet_grid(Subject.num ~ Group2) +
+  scale_x_continuous(breaks = c(10, 20, 30))
 ```
+
+It seems that our `Sex + Group` model has captured the variance between subjects incredibly well. To make sure it isn't an over-fit, one should simulate new data and see how the model translates, or use a training set for the model and a test set for checking accuracy. But for now, our hypotheses testing is finished!
