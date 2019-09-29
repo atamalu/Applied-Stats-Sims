@@ -1,0 +1,121 @@
+---
+title: "Logistic Regression"
+output:
+  github_document:
+    html_preview: true
+    df_print: paged
+---
+
+## Study
+A local bank provides loans to customers with 0% interest over a 12-, 24-, or 36- month period. The bank owner hypothesizes that customers will be more likely to pay on-time if they have to pay less per month; allowing customers to use a smaller portion of personal income. 
+
+To test this hypothesis, the owner decides to model the relationship between "allocated pay periods" and whether customers make on-time payments for <i>each of</i> the first 6 months after acquiring the loan. I
+
+## Data simulation
+```{r}
+set.seed(1500)
+options(scipen=1, digits=3) # number formatting
+
+##### Simulate data ---------------
+grp.12 <- sample(c(0, 1), 
+                 prob = c(0.2, 0.8),
+                 size = 58,
+                 replace = TRUE)
+grp.24 <- sample(c(0, 1), 
+                 prob = c(0.35, 0.65),
+                 size = 76,
+                 replace = TRUE)
+grp.36 <- sample(c(0, 1), 
+                 prob = c(0.455, 0.545),
+                 size = 88,
+                 replace = TRUE)
+
+df <- data.frame(
+  Repay = append(append(grp.12, grp.24), grp.36),
+  Months = append(append(rep('12 Months', 58), 
+                 rep('24 Months', 76)),
+                 rep('36 Months', 88)))
+```
+
+## Data visualization
+First, let's look our data in terms of the proportion of customers that completed their first 6 monthly payments on-time. We group this by allocated pay period.
+
+```{r}
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+theme_set(theme_bw())
+
+##### Make summary table ---------------
+
+## add 0/1 counts by group
+repay.perc <- df %>%
+  group_by(Months, Repay) %>%
+  count(Repay) %>%
+  ungroup() %>%
+  group_by(Months) %>%
+  mutate(freq = n / sum(n)) %>%
+  arrange(-Repay)
+
+##### Graph ---------------
+p <- ggplot(repay.perc, aes(x = factor(1))) +
+  geom_col(aes(y = freq, fill = factor(Repay)), position = 'stack') +
+  coord_polar(theta = "y") +
+  labs(title = 'Percent of customers paid before due') +
+  geom_text(aes(y = freq, label = sprintf("%.2f%%", freq)),
+            position = position_stack(vjust = 0.5)) +
+  facet_wrap(. ~ Months) +
+  scale_x_discrete(name = " ", breaks = NULL) +
+  scale_y_continuous(name = " ", breaks = NULL) +
+  scale_fill_discrete(label = c('On-time', 'Late')) +
+  theme(legend.title = element_blank())
+
+p
+
+```
+There is a clear increase in customers that made timely payments when more time is allocated and monthly payments are smaller.
+
+## Model
+Logistic regression is run similarly to "standard" models in terms of coding. In this case, we start by constructing the same contrast codes that can be used in a one-way ANOVA. 
+
+The first contrast represents the difference between the average for the 12 month group and the average of the 24- and 36- month groups. In other words: does allowing more than a lone 12-month repayment option affect the percent of customers that repay their first 6 payments on-time? 
+
+The second contrast represents the difference between the average repayments at 24 months and 36 months.
+```{r}
+##### Apply contrasts ---------------
+df$con1 <- (df$Months == '12 Months')*(-1) + (df$Months == '24 Months')*(0.5) + (df$Months == '36 Months')*(0.5)
+
+df$con2 <- (df$Months == '12 Months')*(0) + (df$Months == '24 Months')*(-0.5) + (df$Months == '36 Months')*(0.5)
+```
+
+Now that each group has a column for their corresponding contrast weights, we can input them into the model.
+
+```{r}
+source('Functions/mcSummary.R')
+suppressMessages(library(car))
+suppressMessages(library(psych))
+suppressMessages(library(lmSupport))
+
+##### Model data ---------------
+mod1 <- glm(Repay ~ con1 + con2, 
+           data = df, family = 'binomial')
+mod1.summ <- summary(mod1)
+```
+
+The interpretation of the results is in term of logits. Because of this, we should transform the data to make our parameters meaningful. By exponentiating the coefficients of the results, we can effectively change logits into odds.
+
+```{r}
+exp(coef(mod1.summ))[,'Estimate']
+```
+
+##### Intercept
+* On average, across 12-, 24-, and 36- month payment plans, the odds of a customer making their first 6 payments on-time is about 2:1. 
+* The odds of a
+
+The odds of prediabetes are 2.31 times greater for Asians compared to Whites (this matches what we calculated above). 
+
+## Interpretation
+Logistic regression is interpreted differently than "standard" models because the outcome values are limited to 0 and 1. This makes the 
+
+Also diverging from tradition is using the odds-ratio as a measure of effect size. https://www.theanalysisfactor.com/effect-size-statistics-logistic-regression/
+
+## Model visualization
