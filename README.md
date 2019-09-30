@@ -19,7 +19,7 @@ I started writing these markdowns for 2 purposes:
 ## Regression
 
 ### [Simple](https://github.com/atamalu/Applied-Stats-Sims/blob/master/Simple_Regression/simple_regression.md)
-* How does adjusting the pricing of a product affect the quantity sold?
+* How does adjusting the price of a product affect the quantity sold?
 
 ### Multiple
 
