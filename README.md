@@ -4,7 +4,9 @@ This project contains elaborate examples of common statistical models using simu
 I started writing these markdowns for 2 purposes:
 1. To demonstrate how to different models can be used to test hypotheses
 2. To give examples of applying some of these models without "perfect" data
-   * By this, I am referring to the fact that almost all online examples use data that fulfill all statistical assumptions and are devoid of issues in analysis. This is incredibly unrealistic. Data acquired from the real world tends to be more sloppy. Because of this, you will often run into issues when preparing for or performing analyses that requires user-specific knowledge and actual thinking to solve
+    <details><summary>(more info)</summary>
+<p>By this, I am referring to the fact that almost all online examples use data that fulfill all statistical assumptions and are devoid of issues in analysis. This is incredibly unrealistic. Data acquired from the real world tends to be more sloppy. Because of this, you will often run into issues when preparing for or performing analyses that requires user-specific knowledge and actual thinking to solve.
+  </p></details>
 
 ## Multilevel modeling
 
