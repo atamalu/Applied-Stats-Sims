@@ -29,7 +29,7 @@ I started writing these markdowns for 2 purposes:
 
 ## ANOVA
 
-### [t-test (AB test)]
+### [t-test (AB test)](https://github.com/atamalu/Applied-Stats-Sims/blob/master/t_test/t_test.md)
 * Does introducing an at-work socialization period affect employee satisfaction ratings?
 
 ### [One-way](https://github.com/atamalu/Applied-Stats-Sims/blob/master/one_way_anova/one_way_anova.md)
