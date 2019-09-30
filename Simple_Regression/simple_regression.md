@@ -1,0 +1,131 @@
+Simple Regression
+================
+
+## Study
+
+Tom wants to explore and model how adjusting the pricing of product A
+affects the quantity sold. The initial price of a single unit is $2.75.
+
+``` r
+set.seed(150)
+
+##### Simulate data ---------------
+lower.sales <- runif(n = 15, min = 0, max = 2)
+upper.sales <- runif(n = 15, min = 2, max = 4)
+
+df <- data.frame(
+  Quantity = append(upper.sales, lower.sales),
+  Price = seq(2, 3.45, .05)
+)
+```
+
+## Visualization
+
+First, we want to look at the data graphically.
+
+``` r
+library(ggplot2)
+theme_set(theme_bw())
+
+p <- ggplot() +
+  geom_point(aes(x = Price, y = Quantity), df) +
+  labs(
+    x = "Unit Price \n (U.S. Dollars)",
+    y = "Quantity Sold \n (hundreds)"
+  ) 
+p
+```
+
+![](simple_regression_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+Once we model the data, our intercept will represent the quantity sold
+when the price is 0. This could be problematic in interpretation,
+because the price never hits 0. In fact, it stays between $2 and $3.50.
+Therefore, we want to change the Price values to something more
+meaningful: to represent the change from our initial price.
+
+``` r
+df$Price.c <- df$Price - 2.75 
+```
+
+## Model
+
+There appears to be a negative relationship between quantity sold and
+unit price. Let’s see how simple linear model would look. Note how our
+centering changes the meaning of alterations in price, but does not
+affect the spread of our values.
+
+``` r
+### Make model and predictions -----
+mod1 <- lm(Quantity ~ Price.c, data = df)
+mod1.summ <- summary(mod1)
+df$preds <- predict(mod1, df)
+
+### Plot regression line -----
+ggplot() +
+  geom_line(aes(x = Price.c, y = preds), color = 'red', df) +
+  geom_point(aes(x = Price.c, y = Quantity), df) +
+    labs(
+    x = "Change from Starting Price \n (U.S. Dollars)",
+    y = "Quantity Sold \n (hundreds)"
+  ) 
+```
+
+![](simple_regression_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+Using the centered predictor variable, our model will now represent how
+change in price from product A’s initial sale price affects quantity
+sold. Let’s model it and go through the most important parts of the
+results.
+
+``` r
+options(scipen=1, digits=3) # number formatting
+
+### Model
+summary(mod1) 
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = Quantity ~ Price.c, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.7801 -0.4812  0.0378  0.6056  1.3883 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)    1.883      0.139   13.51  8.6e-14 ***
+    ## Price.c       -1.635      0.321   -5.09  2.2e-05 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.762 on 28 degrees of freedom
+    ## Multiple R-squared:  0.48,   Adjusted R-squared:  0.462 
+    ## F-statistic: 25.9 on 1 and 28 DF,  p-value: 0.0000218
+
+``` r
+### Confidence interval
+cints <- confint(mod1, 'Price.c', level=0.95)
+cints
+```
+
+    ##         2.5 % 97.5 %
+    ## Price.c -2.29 -0.977
+
+Our model would be represented as:
+
+<i> Quantity = 1.883 + (-1.635) + Error </i>
+
+## Interpretation
+
+  - Price is a statistically significant predictor of quantity sold
+  - When the price is $2.75, the predicted quantity sold is 1.635
+    (hundred) units
+  - For every dollar that the price increases from our $2.75 starting
+    point, the quantity sold is expected to drop by 1.883 (hundred)
+    units
+  - If we were to accurately replicate this experiment, there would be a
+    95% chance that the change in quantity sold for increasing pricing
+    by an additional dollar would be between -2.294 and -0.977
+  - Our model explains about 48% of the variance in quantity sold
