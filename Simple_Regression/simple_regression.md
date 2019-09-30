@@ -3,8 +3,8 @@ Simple Regression
 
 ## Study
 
-Tom wants to explore and model how adjusting the pricing of product A
-affects the quantity sold. The initial price of a single unit is $2.75.
+Tom wants to examine how adjusting the pricing of product A affects the
+quantity sold. The initial price of a single unit is $2.75.
 
 ``` r
 set.seed(150)
@@ -39,10 +39,10 @@ p
 ![](simple_regression_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Once we model the data, our intercept will represent the quantity sold
-when the price is 0. This could be problematic in interpretation,
-because the price never hits 0. In fact, it stays between $2 and $3.50.
-Therefore, we want to change the Price values to something more
-meaningful: to represent the change from our initial price.
+when the price is 0. Tom is not necessarily interested in how his
+hypothesis or model applies to the general population. Therefore, we
+want to center the Price variable so the intercept represents the change
+from our initial price.
 
 ``` r
 df$Price.c <- df$Price - 2.75 
@@ -51,7 +51,7 @@ df$Price.c <- df$Price - 2.75
 ## Model
 
 There appears to be a negative relationship between quantity sold and
-unit price. Let’s see how simple linear model would look. Note how our
+unit price. Let’s see how a simple linear model would look. Note how our
 centering changes the meaning of alterations in price, but does not
 affect the spread of our values.
 
@@ -106,26 +106,37 @@ summary(mod1)
 
 ``` r
 ### Confidence interval
-cints <- confint(mod1, 'Price.c', level=0.95)
+cints <- confint(mod1, c('(Intercept)', 'Price.c'), level=0.95)
 cints
 ```
 
-    ##         2.5 % 97.5 %
-    ## Price.c -2.29 -0.977
-
-Our model would be represented as:
-
-<i> Quantity = 1.883 + (-1.635) + Error </i>
+    ##             2.5 % 97.5 %
+    ## (Intercept)  1.60  2.168
+    ## Price.c     -2.29 -0.977
 
 ## Interpretation
 
-  - Price is a statistically significant predictor of quantity sold
-  - When the price is $2.75, the predicted quantity sold is 1.635
+#### Intercept
+
+  - When the price is $2.75, the predicted quantity sold is 1.883
     (hundred) units
+  - If we were to replicate this experiment under identical conditions,
+    there is a 95% chance that the change in quantity sold for
+    increasing pricing by an additional dollar would be between 1.597
+    and 2.168
+
+#### Price
+
+  - Price is a statistically significant predictor of quantity sold (p
+    \< .001)
   - For every dollar that the price increases from our $2.75 starting
     point, the quantity sold is expected to drop by 1.883 (hundred)
     units
-  - If we were to accurately replicate this experiment, there would be a
-    95% chance that the change in quantity sold for increasing pricing
-    by an additional dollar would be between -2.294 and -0.977
-  - Our model explains about 48% of the variance in quantity sold
+  - If we replicated this experiment, there is a 95% chance that the
+    change in quantity sold for increasing pricing by an additional
+    dollar would be between -2.294 and -0.977
+
+#### Model
+
+  - Our full model explains about 48% of the variance in the quantity
+    sold

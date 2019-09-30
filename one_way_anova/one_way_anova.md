@@ -13,11 +13,13 @@ Each subject is given a 2-minute socialization period with a juvenile
 subject. The percentage of time each subject spends exhibiting “social
 behaviors” with the juvenile is recorded.
 
-Specifically, Tim wants to know if: <BR>1. Giving subjects a drug
-treatment reduces social anxiety, especially the extent to which it does
-or does not. If the drug is to be considered “effective”, time
-socializing in the drug groups will be higher than the placebo group.
-<BR>2. One drug treatment is more effective than the other
+Specifically, Tim wants to know if:
+
+1.  Giving subjects a drug treatment reduces social anxiety, especially
+    the extent to which it does or does not. If the drug is to be
+    considered “effective”, time socializing in the drug groups will be
+    higher than the placebo group.
+2.  One drug treatment is more effective than the other
 
 ## Data simulation
 
@@ -55,10 +57,8 @@ p <- ggplot() +
   geom_point(aes(x = Group, y = Perc.social), df) +
   geom_boxplot(aes(x = Group,
                    y = Perc.social), alpha = 0.5, df) +
-  labs(
-    x = "Group",
-    y = "Percent of time Socializing"
-  )
+  labs(x = "Group", y = "Percent of time Socializing")
+
 p
 ```
 
@@ -130,31 +130,33 @@ mod1.summ
 
 ## Interpretation
 
-##### Intercept
+#### Intercept
 
   - On average, subjects spent 54.93 percent of the 2-minute test period
     exhibiting social behavior
-  - There is a 95% chance that the true mean of all subjects is between
-    52.766 and 57.094
+  - If we replicated this study, there is a 95% chance that the mean
+    percent of social time of all subjects would be between 52.766 and
+    57.094
 
-##### Contrast 1
+#### Contrast 1
 
   - Subjects that received a drug treatment spent an average of 20.06
     percent more time socializing than those who did not receive a drug
       - This difference is statistically significant
-  - There is a 95% chance that the true difference in means between the
-    Placebo group and drug groups is between 17 and 23.12
+  - If we were to replicate this study, there is a 95% chance that the
+    difference in means between the Placebo group and drug groups would
+    between 17 and 23.12
   - Drug intake explains 94.3% of variance in time spent socializing
 
-##### Contrast 2
+#### Contrast 2
 
   - Of subjects that received a drug, ones that received Drug B spent an
     average of -2.311 percent more time socializing than those who
     received a drug
       - This difference is not statistically significant
-  - There is a 95% chance that the true difference in means between
-    subjects that received Drug A and subjects that received Drug B is
-    between -7.611 and 2.99
+  - There is a 95% chance that if we replicated our experiment, the
+    difference in means between subjects that received Drug A and
+    subjects that received Drug B is between -7.611 and 2.99
   - The difference in drugs explains 12.6% of the variance in time spent
     socializing
 
