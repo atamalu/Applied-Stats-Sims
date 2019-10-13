@@ -17,7 +17,9 @@ I started writing these markdowns to demonstrate how different models can be use
 
 ### Multiple
 
-### Logistic
+### [Logistic](https://github.com/atamalu/Applied-Stats-Sims/blob/master/Logistic_Regression/Logistic_Regression.md)
+* Do longer allocated loan repayment periods increase the odds of making the first 6 months of payments on-time?
+* Is there a difference between the 2 longer pay periods?
 
 ### Poisson
 
