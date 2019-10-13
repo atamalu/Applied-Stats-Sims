@@ -1,0 +1,93 @@
+---
+title: "Multiple Regression"
+output:
+  github_document:
+    html_preview: true
+    df_print: paged
+---
+
+## Study
+Giovani is a local Italian food restaurant owner looking for ideal cities in Colorado to expand his business to. Before designing a complex model, he wants to get a general idea of consumer spending based on some rough preliminary data. Giovani believes that he could get a decent estimate by controlling for 
+
+```{r}
+set.seed(150)
+
+##### Simulate data ---------------
+lower.sales <- runif(n = 15, min = 0, max = 2)
+upper.sales <- runif(n = 15, min = 2, max = 4)
+
+df <- data.frame(
+  Quantity = append(upper.sales, lower.sales),
+  Price = seq(2, 3.45, .05)
+)
+```
+
+## Visualization
+First, we want to look at the data graphically.
+
+```{r}
+library(ggplot2)
+theme_set(theme_bw())
+
+p <- ggplot() +
+  geom_point(aes(x = Price, y = Quantity), df) +
+  labs(
+    x = "Unit Price \n (U.S. Dollars)",
+    y = "Quantity Sold \n (hundreds)"
+  ) 
+p
+```
+
+Once we model the data, our intercept will represent the quantity sold when the price is 0. Tom is not necessarily interested in how his hypothesis or model applies to the general population. Therefore, we want to center the Price variable so the intercept represents the change from our initial price.
+
+```{r}
+df$Price.c <- df$Price - 2.75 
+```
+
+
+## Model 
+
+There appears to be a negative relationship between quantity sold and unit price. Let's see how a simple linear model would look. Note how our centering changes the meaning of alterations in price, but does not affect the spread of our values.
+
+```{r}
+### Make model and predictions -----
+mod1 <- lm(Quantity ~ Price.c, data = df)
+mod1.summ <- summary(mod1)
+df$preds <- predict(mod1, df)
+
+### Plot regression line -----
+ggplot() +
+  geom_line(aes(x = Price.c, y = preds), color = 'red', df) +
+  geom_point(aes(x = Price.c, y = Quantity), df) +
+    labs(
+    x = "Change from Starting Price \n (U.S. Dollars)",
+    y = "Quantity Sold \n (hundreds)"
+  ) 
+```
+
+Using the centered predictor variable, our model will now represent how change in price from product A's initial sale price affects quantity sold. Let's model it and go through the most important parts of the results. 
+
+```{r}
+options(scipen=1, digits=3) # number formatting
+
+### Model
+summary(mod1) 
+
+### Confidence interval
+cints <- confint(mod1, c('(Intercept)', 'Price.c'), level=0.95)
+cints
+```
+
+## Interpretation
+
+#### Intercept
+* When the price is $2.75, the predicted quantity sold is `r abs(mod1.summ$coefficients[[1]])` (hundred) units
+* If we were to replicate this experiment under identical conditions, there is a 95% chance that the change in quantity sold for increasing pricing by an additional dollar would be between `r cints['(Intercept)',][1]` and `r cints['(Intercept)',][2]`
+
+#### Price
+* Price is a statistically significant predictor of quantity sold (p < .001)
+* For every dollar that the price increases from our $2.75 starting point, the quantity sold is expected to drop by `r abs(mod1.summ$coefficients[[1]])` (hundred) units
+* If we replicated this experiment, there is a 95% chance that the change in quantity sold for increasing pricing by an additional dollar would be between `r cints['Price.c',][1]` and `r cints['Price.c',][2]`
+
+#### Model
+* Our full model explains about 48% of the variance in the quantity sold

@@ -7,11 +7,12 @@ output:
 ---
 
 ## Study
-A local bank provides loans to customers with 0% interest over a 12-, 24-, or 36- month period. The bank owner hypothesizes that customers will be more likely to pay on-time if they have to pay less per month; allowing customers to use a smaller portion of personal income. 
+A local bank provides loans to customers with 0% interest over a 12-, 24-, or 36- month period. The bank owner hypothesizes that customers will be more likely to pay on-time if they have to pay less per month; allowing customers to use a smaller portion of personal income on a short-term basis. 
 
-To test this hypothesis, the owner decides to model the relationship between "allocated pay periods" and whether customers make on-time payments for <i>each of</i> the first 6 months after acquiring the loan. I
+To test this hypothesis, the owner decides to model the relationship between "allocated pay periods" and whether customers make on-time payments for <i>all of</i> the first 6 months.
 
 ## Data simulation
+
 ```{r}
 set.seed(1500)
 options(scipen=1, digits=3) # number formatting
@@ -38,6 +39,7 @@ df <- data.frame(
 ```
 
 ## Data visualization
+
 First, let's look our data in terms of the proportion of customers that completed their first 6 monthly payments on-time. We group this by allocated pay period.
 
 ```{r}
@@ -70,16 +72,18 @@ p <- ggplot(repay.perc, aes(x = factor(1))) +
   theme(legend.title = element_blank())
 
 p
-
 ```
+
 There is a clear increase in customers that made timely payments when more time is allocated and monthly payments are smaller.
 
 ## Model
+
 Logistic regression is run similarly to "standard" models in terms of coding. In this case, we start by constructing the same contrast codes that can be used in a one-way ANOVA. 
 
 The first contrast represents the difference between the average for the 12 month group and the average of the 24- and 36- month groups. In other words: does allowing more than a lone 12-month repayment option affect the percent of customers that repay their first 6 payments on-time? 
 
 The second contrast represents the difference between the average repayments at 24 months and 36 months.
+
 ```{r}
 ##### Apply contrasts ---------------
 df$con1 <- (df$Months == '12 Months')*(-1) + (df$Months == '24 Months')*(0.5) + (df$Months == '36 Months')*(0.5)
@@ -90,32 +94,36 @@ df$con2 <- (df$Months == '12 Months')*(0) + (df$Months == '24 Months')*(-0.5) + 
 Now that each group has a column for their corresponding contrast weights, we can input them into the model.
 
 ```{r}
-source('Functions/mcSummary.R')
-suppressMessages(library(car))
-suppressMessages(library(psych))
-suppressMessages(library(lmSupport))
-
 ##### Model data ---------------
 mod1 <- glm(Repay ~ con1 + con2, 
            data = df, family = 'binomial')
 mod1.summ <- summary(mod1)
+
+mod1.summ
 ```
 
 The interpretation of the results is in term of logits. Because of this, we should transform the data to make our parameters meaningful. By exponentiating the coefficients of the results, we can effectively change logits into odds.
 
 ```{r}
-exp(coef(mod1.summ))[,'Estimate']
+coefss <- exp(coef(mod1.summ)[,'Estimate'])
+coefss
+
+conf.ints <- as.data.frame(exp(confint(mod1)))
+conf.ints
 ```
+## Interpretation
 
 ##### Intercept
-* On average, across 12-, 24-, and 36- month payment plans, the odds of a customer making their first 6 payments on-time is about 2:1. 
-* The odds of a
+* On average, across 12-, 24-, and 36- month payment plans, the odds of a customer being late on at least 1 of 6 payments is about 2:1.
+  * If we repeatedly replicated this study, there is a 95% chance that these odds would be between `r conf.ints['(Intercept)',1]` and `r conf.ints['(Intercept)',2]`
 
-The odds of prediabetes are 2.31 times greater for Asians compared to Whites (this matches what we calculated above). 
+##### 12 months vs. 24- and 36- months
+* The odds of a customer making all payments on-time is, on average, about 2.4 times higher for customers with 24- or 36- month financing than 12- month financing 
+  * This is statistically significant (p < .001)
+  * If we replicated this study, there is a 95% chance that these odds would be between `r conf.ints['con1',1]` and `r conf.ints['con1',2]`
 
-## Interpretation
-Logistic regression is interpreted differently than "standard" models because the outcome values are limited to 0 and 1. This makes the 
+##### 24 months vs. 36 months
+* On average customers who chose a 36-month pay period are around 1.5 times more likely to make all payments on-time than customers who choose a 24-month plan
+  * This is not statistically significant (p = `r coef(mod1.summ)[,'Pr(>|z|)'][3]`)
+  * If we replicated this study, there is a 95% chance that these odds would be between `r conf.ints['con2',1]` and `r conf.ints['con2',2]`
 
-Also diverging from tradition is using the odds-ratio as a measure of effect size. https://www.theanalysisfactor.com/effect-size-statistics-logistic-regression/
-
-## Model visualization
