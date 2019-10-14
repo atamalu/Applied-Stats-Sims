@@ -16,14 +16,17 @@ I started writing these markdowns to demonstrate how different models can be use
 * How does adjusting the price of a product affect the quantity sold?
 
 ### Multiple
+* Does a restaurant's ratings affect revenue after controlling for the area's median income?
 
 ### [Logistic](https://github.com/atamalu/Applied-Stats-Sims/blob/master/Logistic_Regression/Logistic_Regression.md)
 * Do longer allocated loan repayment periods increase the odds of making the first 6 months of payments on-time?
 * Is there a difference between the 2 longer pay periods?
 
 ### Poisson
+* How does the win-loss ratio affect the number of touchdowns a team scores in a football game?
 
 ### Survival
+* How do we predict the number of days customers will go between visits?
 
 ## ANOVA
 
@@ -35,7 +38,12 @@ I started writing these markdowns to demonstrate how different models can be use
 * Is one drug more effective than the other?
 
 ### Two-way/Factorial
+see: multilevel factorial section
 
-### Repeated measures
+### Repeated measures (mixed ANOVA)
+* How does being a weekday or weekend impact attendance of an art showcase?
+* Does attendance differ between any of the 3 months?
 
-### Transformations
+### Transformation
+* Logit (proportions)
+* Ladder of powers
