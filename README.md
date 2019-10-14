@@ -23,6 +23,8 @@ I started writing these markdowns to demonstrate how different models can be use
 
 ### Poisson
 
+### Survival
+
 ## ANOVA
 
 ### [t-test (AB test)](https://github.com/atamalu/Applied-Stats-Sims/blob/master/t_test/t_test.md)
