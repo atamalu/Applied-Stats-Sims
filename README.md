@@ -44,6 +44,12 @@ see: multilevel factorial section
 * How does being a weekday or weekend impact attendance of an art showcase?
 * Does attendance differ between any of the 3 months?
 
-### Transformation
-* Logit (proportions)
+## Misc
+
+### Transformations
+* Logit and probit
 * Ladder of powers
+
+### Normalization and Standardizing
+* z-scores (standard)
+* z-scores (with time series)
