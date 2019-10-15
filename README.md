@@ -1,5 +1,5 @@
 # Applied Statistics: Simulation Studies
-This project contains elaborate examples of common statistical models using simulated data from hypothetical studies. Each markdown simulates, visualizes, and models the data. These steps are followed by an easily-understandable interpretation of the results in terms of the study. For more complex designs, the logic behind most steps are also explained (see: factorial multilevel model).
+This project contains elaborate examples of common statistical models using simulated data from hypothetical studies. Each markdown simulates, visualizes, and models the data. These steps are followed by an easily-understandable interpretation of the results in terms of the study. For more complex designs, the logic behind most steps are also explained.
 
 I started writing these markdowns to demonstrate how different models can be used to test hypotheses
 
