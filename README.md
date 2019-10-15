@@ -1,5 +1,5 @@
 # Applied Statistics: Simulation Studies
-This project contains elaborate examples of common statistical models using simulated data from hypothetical studies. Each markdown simulates, visualizes, and models the data. These steps are followed by an easily-understandable interpretation of the results in terms of the study. For more complex designs, the logic behind most steps are also explained.
+This project contains elaborate examples of common statistical models using simulated data from hypothetical studies. Each markdown simulates, visualizes, and models the data. These steps are followed by an easily-understandable interpretation of the results in terms of the study. 
 
 I started writing these markdowns to demonstrate how different models can be used to test hypotheses
 
@@ -16,14 +16,14 @@ I started writing these markdowns to demonstrate how different models can be use
 * How does adjusting the price of a product affect the quantity sold?
 
 ### Multiple
-* Does a restaurant's ratings affect revenue after controlling for the area's median income?
+* Does company A's product debut affect sales of company B's product after controlling for company C's sales?
 
 ### [Logistic](https://github.com/atamalu/Applied-Stats-Sims/blob/master/Logistic_Regression/Logistic_Regression.md)
 * Do longer allocated loan repayment periods increase the odds of making the first 6 months of payments on-time?
 * Is there a difference between the 2 longer pay periods?
 
 ### Poisson
-* How does the win-loss ratio affect the number of touchdowns a team scores in a football game?
+* What is the relationship between a team's win-loss ratio and the number of touchdowns they score?
 
 ### Survival
 * How do we predict the number of days customers will go between visits?
