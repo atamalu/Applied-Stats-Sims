@@ -16,7 +16,7 @@ I started writing these markdowns to demonstrate how different models can be use
 * How does adjusting the price of a product affect the quantity sold?
 
 ### Multiple
-* Does company A's product debut affect sales of company B's product after controlling for company C's sales?
+* Does a company's weight loss product significantly decrease weight after controlling for height and gender?
 
 ### [Logistic](https://github.com/atamalu/Applied-Stats-Sims/blob/master/Logistic_Regression/Logistic_Regression.md)
 * Do longer allocated loan repayment periods increase the odds of making the first 6 months of payments on-time?
