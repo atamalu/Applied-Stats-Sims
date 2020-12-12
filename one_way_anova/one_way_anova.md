@@ -4,9 +4,9 @@ One-way ANOVA
 ## Study
 
 Tim is a pharmacology researcher designing a study to test the
-effectiveness of drugs A and B on treating social anxiety in rat
+effectiveness of drugs A and B on treating social anxiety in animal
 subjects with the disorder. He randomly assigns subjects to 3 groups:
-Placebo (control), Drug A, and Drug B. That is; 14 subjects receive a
+Placebo (control), Drug A, and Drug B. That is: 14 subjects receive a
 sugar pill, 14 receive Drug A, and 14 receive Drug B.
 
 Each subject is given a 2-minute socialization period with a juvenile
@@ -19,6 +19,7 @@ Specifically, Tim wants to know if:
     the extent to which it does or does not. If the drug is to be
     considered “effective”, time socializing in the drug groups will be
     higher than the placebo group.
+
 2.  One drug treatment is more effective than the other
 
 ## Data simulation
@@ -48,18 +49,16 @@ First, let’s look at the data. We can look at both the distribution of
 data points and quartile information by using a boxplot.
 
 ``` r
-suppressMessages(library(ggplot2))
-suppressMessages(library(dplyr))
+library(ggplot2)
+library(dplyr)
 theme_set(theme_bw())
 
 ##### Plot ---------------
-p <- ggplot() +
-  geom_point(aes(x = Group, y = Perc.social), df) +
-  geom_boxplot(aes(x = Group,
-                   y = Perc.social), alpha = 0.5, df) +
+ggplot(df) +
+  geom_point(aes(x = Group, y = Perc.social)) +
+  geom_boxplot(aes(x = Group, y = Perc.social), 
+               alpha = 0.5) +
   labs(x = "Group", y = "Percent of time Socializing")
-
-p
 ```
 
 ![](one_way_anova_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -68,8 +67,8 @@ p
 
 Before we construct the model, we design contrasts to represent group
 differences. These contrasts test Tim’s hypotheses 1 and 2,
-respectively. Is there an effect of drug, and does this effect differ
-between drugs?
+respectively. Is there an effect of drug administration? Does this
+effect differ between drugs?
 
 ``` r
 ##### Contrasts ---------------
@@ -81,7 +80,7 @@ con.mat <- rbind(con.1, con.2)
 rownames(con.mat) <- c('drug', 'A vs B')
 colnames(con.mat) <- c('Placebo', 'Drug A', 'Drug B')
 
-con.mat
+print(con.mat)
 ```
 
     ##        Placebo Drug A Drug B
@@ -93,9 +92,9 @@ multiplying values of each contrast by their respective outcomes.
 
 ``` r
 source('mcSummary.R')
-suppressMessages(library(car))
-suppressMessages(library(psych))
-suppressMessages(library(lmSupport))
+library(car)
+library(psych)
+library(lmSupport)
 
 ##### Apply contrasts ---------------
 df$drug.con <- (df$Group == 'Placebo')*(-1) + (df$Group == 'Drug A')*(0.5) + (df$Group == 'Drug B')*(0.5)
@@ -106,7 +105,7 @@ df$AB.con <- (df$Group == 'Placebo')*(0) + (df$Group == 'Drug A')*(-0.5) + (df$G
 mod1 <- lm(Perc.social ~ drug.con + AB.con, data = df)
 mod1.summ <- mcSummary(mod1)
 
-mod1.summ
+print(mod1.summ)
 ```
 
     ## $call
@@ -134,30 +133,39 @@ mod1.summ
 
   - On average, subjects spent 54.93 percent of the 2-minute test period
     exhibiting social behavior
-  - If we replicated this study, there is a 95% chance that the mean
-    percent of social time of all subjects would be between 52.766 and
-    57.094
 
-#### Contrast 1
+  - If we repeatedly replicated this study under identical conditions,
+    there is a 95% chance that the average percent of social time of all
+    subjects would be between 52.766 and 57.094
+
+#### Contrast 1 (placebo vs. drug)
 
   - Subjects that received a drug treatment spent an average of 20.06
     percent more time socializing than those who did not receive a drug
+    
       - This difference is statistically significant
-  - If we were to replicate this study, there is a 95% chance that the
-    difference in means between the Placebo group and drug groups would
-    between 17 and 23.12
-  - Drug intake explains 94.3% of variance in time spent socializing
 
-#### Contrast 2
+  - If we were to repeatedly replicate this study, there is a 95% chance
+    that the difference in means between the placebo group and drug
+    groups would between 17 and 23.12
+
+  - Drug intake explains 0.818 percent of variance in time spent
+    socializing
+
+#### Contrast 2 (drug A vs. drug B)
 
   - Of subjects that received a drug, ones that received Drug B spent an
     average of -2.311 percent more time socializing than those who
     received a drug
+    
       - This difference is not statistically significant
-  - There is a 95% chance that if we replicated our experiment, the
-    difference in means between subjects that received Drug A and
-    subjects that received Drug B is between -7.611 and 2.99
-  - The difference in drugs explains 12.6% of the variance in time spent
+
+  - There is a 95% chance that if we repeatedly replicated our
+    experiment, the difference in means between subjects that received
+    Drug A and subjects that received Drug B would be between -7.611 and
+    2.99
+
+  - The difference in drugs explains 0.02 of the variance in time spent
     socializing
 
 ## Visualization
