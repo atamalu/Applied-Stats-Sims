@@ -7,6 +7,7 @@ output:
 ---
 
 ## Study
+
 Sarah, an HR rep, is looking to improve employee satisfaction in Clinic A. She hypothesizes that these employee satisfaction ratings can be raised by adding a 15-minute socialization period in the afternoon. To perform this, Sarah randomly selects half of the staff to receive the socialization period (social group) and half to carry on business as usual (control group).
 
 ```{r}
@@ -25,9 +26,9 @@ df <- data.frame(
 
 First, let's look at the data. We can look at both the summary statistics and the values by adding individual points to a bar graph of the means.
 
-```{r}
-suppressMessages(library(ggplot2))
-suppressMessages(library(dplyr))
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
 theme_set(theme_bw())
 
 summ.df <- df %>% 
@@ -38,7 +39,7 @@ summ.df <- df %>%
 perc.diff <- (summ.df$Rating[summ.df$Group == 'social'] - summ.df$Rating[summ.df$Group == 'control']) / abs(summ.df$Rating[summ.df$Group == 'control'])
 perc.diff <- perc.diff*100
 
-p <- ggplot() +
+ggplot() +
   geom_bar(aes(x = Group, y = Rating), summ.df, stat = 'identity') +
   geom_point(aes(x = Group, y = Rating), df) +
   labs(
@@ -46,7 +47,6 @@ p <- ggplot() +
     y = "Employee Satisfaction Rating"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
-p
 ```
 
 The social group seems to rate satisfaction higher than the control group. However, the difference is so small that it looks like there's a good chance it could also be the result of coincidence. This is where statistical modeling helps by giving us an idea of whether a socialization period was a significantly effective manipulation in increasing average employee satisfaction ratings and how big of an effect it had and may have if our experiment is replicated. 
@@ -67,9 +67,9 @@ By dummy coding our groups, we can interpret our results in terms of how the pre
 mod1 <- lm(Rating ~ Group.code, data = df)
 mod1.summ <- summary(mod1)
 
-mod1.summ
-
 df$preds <- predict(mod1, df)
+
+print(mod1.summ)
 ```
 
 We almost achieve statistical significance with p > .05. In context, however, an R-squared value of `r mod1.summ$r.squared` is somewhat interesting, but the actual decision to add the break period depends on the opportunity cost for taking away 15 minutes from working.
@@ -80,8 +80,7 @@ summary(mod1)
 
 ### Confidence interval
 cints <- confint(mod1, 'Group.code', level=0.95)
-cints
-
+print(cints)
 ```
 
 Our model would be represented as:
@@ -89,8 +88,13 @@ Our model would be represented as:
 <i> Rating = `r mod1.summ$coefficients[[1]]` + (`r mod1.summ$coefficients[[2]]`)Group + Error </i>
 
 ## Interpretation
-* A socialization period (Group) resulted in an almost-statistically significant difference in employee satisfaction ratings (p = `r mod1.summ$coefficients[[8]]`)
+
 * In the absence of a socialization period, ratings are, on average, `r abs(mod1.summ$coefficients[[1]])`
-* When a socialization period is present, employee satisfaction ratings are expected to be `r abs(mod1.summ$coefficients[[2]])` points higher than those who do not receive one; a difference of about `r perc.diff` 
-* If we were to accurately replicate this experiment, there is a 95% chance that the change in ratings from the addition of a socialization period is between `r cints[1]` and `r cints[2]`
-* Our model explains about `r mod1.summ$r.squared` of the variance in employee satistfaction ratings
+
+* When a socialization period is present, employee satisfaction ratings are expected to be `r abs(mod1.summ$coefficients[[2]])` points higher than those who do not receive one; a difference of about `r perc.diff` percent
+
+* If we were to repeatedly replicate this experiment under identical conditions, there is a 95% chance that the change in ratings from the addition of a socialization period is between `r cints[1]` and `r cints[2]`
+
+* A socialization period (Group) resulted in an almost-statistically significant difference in employee satisfaction ratings (<i>p</i> = `r mod1.summ$coefficients[[8]]`)
+
+* Our model explains about `r mod1.summ$r.squared` percent of the variance in employee satisfaction ratings

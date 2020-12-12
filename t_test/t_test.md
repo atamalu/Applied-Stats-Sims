@@ -29,8 +29,8 @@ statistics and the values by adding individual points to a bar graph of
 the means.
 
 ``` r
-suppressMessages(library(ggplot2))
-suppressMessages(library(dplyr))
+library(ggplot2)
+library(dplyr)
 theme_set(theme_bw())
 
 summ.df <- df %>% 
@@ -41,7 +41,7 @@ summ.df <- df %>%
 perc.diff <- (summ.df$Rating[summ.df$Group == 'social'] - summ.df$Rating[summ.df$Group == 'control']) / abs(summ.df$Rating[summ.df$Group == 'control'])
 perc.diff <- perc.diff*100
 
-p <- ggplot() +
+ggplot() +
   geom_bar(aes(x = Group, y = Rating), summ.df, stat = 'identity') +
   geom_point(aes(x = Group, y = Rating), df) +
   labs(
@@ -49,7 +49,6 @@ p <- ggplot() +
     y = "Employee Satisfaction Rating"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
-p
 ```
 
 ![](t_test_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -80,7 +79,9 @@ satisfaction ratings.
 mod1 <- lm(Rating ~ Group.code, data = df)
 mod1.summ <- summary(mod1)
 
-mod1.summ
+df$preds <- predict(mod1, df)
+
+print(mod1.summ)
 ```
 
     ## 
@@ -101,10 +102,6 @@ mod1.summ
     ## Residual standard error: 1.39 on 38 degrees of freedom
     ## Multiple R-squared:  0.0846, Adjusted R-squared:  0.0605 
     ## F-statistic: 3.51 on 1 and 38 DF,  p-value: 0.0686
-
-``` r
-df$preds <- predict(mod1, df)
-```
 
 We almost achieve statistical significance with p \> .05. In context,
 however, an R-squared value of 0.085 is somewhat interesting, but the
@@ -138,7 +135,7 @@ summary(mod1)
 ``` r
 ### Confidence interval
 cints <- confint(mod1, 'Group.code', level=0.95)
-cints
+print(cints)
 ```
 
     ##              2.5 % 97.5 %
@@ -150,14 +147,20 @@ Our model would be represented as:
 
 ## Interpretation
 
-  - A socialization period (Group) resulted in an almost-statistically
-    significant difference in employee satisfaction ratings (p = 0.069)
   - In the absence of a socialization period, ratings are, on average,
     7.027
+
   - When a socialization period is present, employee satisfaction
     ratings are expected to be 0.823 points higher than those who do not
-    receive one; a difference of about 11.717
-  - If we were to accurately replicate this experiment, there is a 95%
-    chance that the change in ratings from the addition of a
-    socialization period is between -0.066 and 1.713
-  - Our model explains about 0.085 of the variance in quantity sold
+    receive one; a difference of about 11.717 percent
+
+  - If we were to repeatedly replicate this experiment under identical
+    conditions, there is a 95% chance that the change in ratings from
+    the addition of a socialization period is between -0.066 and 1.713
+
+  - A socialization period (Group) resulted in an almost-statistically
+    significant difference in employee satisfaction ratings (<i>p</i> =
+    0.069)
+
+  - Our model explains about 0.085 percent of the variance in employee
+    satisfaction ratings
