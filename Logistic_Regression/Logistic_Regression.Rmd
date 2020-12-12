@@ -7,6 +7,7 @@ output:
 ---
 
 ## Study
+
 A local bank provides loans to customers with 0% interest over a 12-, 24-, or 36- month period. The bank owner hypothesizes that customers will be more likely to pay on-time if they have to pay less per month; allowing customers to use a smaller portion of personal income on a short-term basis. 
 
 To test this hypothesis, the owner decides to model the relationship between "allocated pay periods" and whether customers make on-time payments for <i>all of</i> the first 6 months.
@@ -42,9 +43,9 @@ df <- data.frame(
 
 First, let's look our data in terms of the proportion of customers that completed their first 6 monthly payments on-time. We group this by allocated pay period.
 
-```{r}
-suppressMessages(library(dplyr))
-suppressMessages(library(ggplot2))
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
 theme_set(theme_bw())
 
 ##### Make summary table ---------------
@@ -59,7 +60,7 @@ repay.perc <- df %>%
   arrange(-Repay)
 
 ##### Graph ---------------
-p <- ggplot(repay.perc, aes(x = factor(1))) +
+ggplot(repay.perc, aes(x = factor(1))) +
   geom_col(aes(y = freq, fill = factor(Repay)), position = 'stack') +
   coord_polar(theta = "y") +
   labs(title = 'Percent of customers paid before due') +
@@ -70,8 +71,6 @@ p <- ggplot(repay.perc, aes(x = factor(1))) +
   scale_y_continuous(name = " ", breaks = NULL) +
   scale_fill_discrete(label = c('On-time', 'Late')) +
   theme(legend.title = element_blank())
-
-p
 ```
 
 There is a clear increase in customers that made timely payments when more time is allocated and monthly payments are smaller.
@@ -99,31 +98,38 @@ mod1 <- glm(Repay ~ con1 + con2,
            data = df, family = 'binomial')
 mod1.summ <- summary(mod1)
 
-mod1.summ
+print(mod1.summ)
 ```
 
 The interpretation of the results is in term of logits. Because of this, we should transform the data to make our parameters meaningful. By exponentiating the coefficients of the results, we can effectively change logits into odds.
 
 ```{r}
 coefss <- exp(coef(mod1.summ)[,'Estimate'])
-coefss
+print(coefss)
 
 conf.ints <- as.data.frame(exp(confint(mod1)))
-conf.ints
+print(conf.ints)
 ```
+
 ## Interpretation
 
 ##### Intercept
+
 * On average, across 12-, 24-, and 36- month payment plans, the odds of a customer being late on at least 1 of 6 payments is about 2:1.
+
   * If we repeatedly replicated this study, there is a 95% chance that these odds would be between `r conf.ints['(Intercept)',1]` and `r conf.ints['(Intercept)',2]`
 
 ##### 12 months vs. 24- and 36- months
+
 * The odds of a customer making all payments on-time is, on average, about 2.4 times higher for customers with 24- or 36- month financing than 12- month financing 
-  * This is statistically significant (p < .001)
+  * This is statistically significant (<i>p</i> < .001)
   * If we replicated this study, there is a 95% chance that these odds would be between `r conf.ints['con1',1]` and `r conf.ints['con1',2]`
 
 ##### 24 months vs. 36 months
+
 * On average customers who chose a 36-month pay period are around 1.5 times more likely to make all payments on-time than customers who choose a 24-month plan
-  * This is not statistically significant (p = `r coef(mod1.summ)[,'Pr(>|z|)'][3]`)
-  * If we replicated this study, there is a 95% chance that these odds would be between `r conf.ints['con2',1]` and `r conf.ints['con2',2]`
+
+  * This is not statistically significant (<i>p</i> = `r coef(mod1.summ)[,'Pr(>|z|)'][3]`)
+  
+  * If we repeatedly replicated this study, there is a 95% chance that these odds would be between `r conf.ints['con2',1]` and `r conf.ints['con2',2]`
 

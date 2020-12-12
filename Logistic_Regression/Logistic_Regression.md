@@ -47,8 +47,8 @@ completed their first 6 monthly payments on-time. We group this by
 allocated pay period.
 
 ``` r
-suppressMessages(library(dplyr))
-suppressMessages(library(ggplot2))
+library(dplyr)
+library(ggplot2)
 theme_set(theme_bw())
 
 ##### Make summary table ---------------
@@ -63,7 +63,7 @@ repay.perc <- df %>%
   arrange(-Repay)
 
 ##### Graph ---------------
-p <- ggplot(repay.perc, aes(x = factor(1))) +
+ggplot(repay.perc, aes(x = factor(1))) +
   geom_col(aes(y = freq, fill = factor(Repay)), position = 'stack') +
   coord_polar(theta = "y") +
   labs(title = 'Percent of customers paid before due') +
@@ -74,8 +74,6 @@ p <- ggplot(repay.perc, aes(x = factor(1))) +
   scale_y_continuous(name = " ", breaks = NULL) +
   scale_fill_discrete(label = c('On-time', 'Late')) +
   theme(legend.title = element_blank())
-
-p
 ```
 
 ![](Logistic_Regression_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -113,7 +111,7 @@ mod1 <- glm(Repay ~ con1 + con2,
            data = df, family = 'binomial')
 mod1.summ <- summary(mod1)
 
-mod1.summ
+print(mod1.summ)
 ```
 
     ## 
@@ -147,7 +145,7 @@ change logits into odds.
 
 ``` r
 coefss <- exp(coef(mod1.summ)[,'Estimate'])
-coefss
+print(coefss)
 ```
 
     ## (Intercept)        con1        con2 
@@ -160,16 +158,13 @@ conf.ints <- as.data.frame(exp(confint(mod1)))
     ## Waiting for profiling to be done...
 
 ``` r
-conf.ints
+print(conf.ints)
 ```
 
-<div data-pagedtable="false">
-
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["2.5 %"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["97.5 %"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.491","2":"2.769","_rn_":"(Intercept)"},{"1":"0.246","2":"0.675","_rn_":"con1"},{"1":"0.344","2":"1.201","_rn_":"con2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-
-</div>
+    ##             2.5 % 97.5 %
+    ## (Intercept) 1.491  2.769
+    ## con1        0.246  0.675
+    ## con2        0.344  1.201
 
 ## Interpretation
 
@@ -177,6 +172,7 @@ conf.ints
 
   - On average, across 12-, 24-, and 36- month payment plans, the odds
     of a customer being late on at least 1 of 6 payments is about 2:1.
+    
       - If we repeatedly replicated this study, there is a 95% chance
         that these odds would be between 1.491 and 2.769
 
@@ -185,7 +181,7 @@ conf.ints
   - The odds of a customer making all payments on-time is, on average,
     about 2.4 times higher for customers with 24- or 36- month financing
     than 12- month financing
-      - This is statistically significant (p \< .001)
+      - This is statistically significant (<i>p</i> \< .001)
       - If we replicated this study, there is a 95% chance that these
         odds would be between 0.246 and 0.675
 
@@ -194,6 +190,8 @@ conf.ints
   - On average customers who chose a 36-month pay period are around 1.5
     times more likely to make all payments on-time than customers who
     choose a 24-month plan
-      - This is not statistically significant (p = 0.169)
-      - If we replicated this study, there is a 95% chance that these
-        odds would be between 0.344 and 1.201
+    
+      - This is not statistically significant (<i>p</i> = 0.169)
+    
+      - If we repeatedly replicated this study, there is a 95% chance
+        that these odds would be between 0.344 and 1.201
