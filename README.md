@@ -1,5 +1,5 @@
 # Applied Statistics: Simulation Studies
-This project contains elaborate examples of common statistical models using simulated data from hypothetical studies. Each markdown simulates, visualizes, and models the data. These steps are followed by an easily-understandable interpretation of the results in terms of the study. For more complex designs, the logic behind most steps are also explained (see: factorial multilevel model).
+This project contains elaborate examples of common statistical models using simulated data from hypothetical studies. Each markdown simulates, visualizes, and models the data. These steps are followed by an easily-understandable interpretation of the results in terms of the study. 
 
 I started writing these markdowns to demonstrate how different models can be used to test hypotheses
 
@@ -16,10 +16,17 @@ I started writing these markdowns to demonstrate how different models can be use
 * How does adjusting the price of a product affect the quantity sold?
 
 ### Multiple
+* Does a company's weight loss product significantly decrease weight after controlling for height and gender?
 
-### Logistic
+### [Logistic](https://github.com/atamalu/Applied-Stats-Sims/blob/master/Logistic_Regression/Logistic_Regression.md)
+* Do longer allocated loan repayment periods increase the odds of making the first 6 months of payments on-time?
+* Is there a difference between the 2 longer pay periods?
 
 ### Poisson
+* What is the relationship between a team's win-loss ratio and the number of touchdowns they score?
+
+### Survival
+* How do we predict the number of days customers will go between visits?
 
 ## ANOVA
 
@@ -31,7 +38,18 @@ I started writing these markdowns to demonstrate how different models can be use
 * Is one drug more effective than the other?
 
 ### Two-way/Factorial
+see: multilevel factorial section
 
-### Repeated measures
+### Repeated measures (mixed ANOVA)
+* How does being a weekday or weekend impact attendance of an art showcase?
+* Does attendance differ between any of the 3 months?
+
+## Misc
 
 ### Transformations
+* Logit and probit
+* Ladder of powers
+
+### Normalization and Standardizing
+* z-scores (standard)
+* z-scores (with time series)
