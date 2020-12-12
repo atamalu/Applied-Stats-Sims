@@ -1,5 +1,5 @@
 ---
-title: "Simple Regression"
+title: "Multiple Regression"
 output:
   github_document:
     html_preview: true
@@ -7,8 +7,7 @@ output:
 ---
 
 ## Study
-
-Tom wants to examine how adjusting the pricing of product A affects the quantity sold. The initial price of a single unit is $2.75.
+Earl, a restaurant owner, wants to estimate the number of days customers will go between visits.
 
 ```{r}
 set.seed(150)
@@ -24,7 +23,6 @@ df <- data.frame(
 ```
 
 ## Visualization
-
 First, we want to look at the data graphically.
 
 ```{r}
@@ -52,19 +50,10 @@ df$Price.c <- df$Price - 2.75
 There appears to be a negative relationship between quantity sold and unit price. Let's see how a simple linear model would look. Note how our centering changes the meaning of alterations in price, but does not affect the spread of our values.
 
 ```{r}
-### Make model and predictions -----
-mod1 <- lm(Quantity ~ Price.c, data = df)
-mod1.summ <- summary(mod1)
-df$preds <- predict(mod1, df)
-
-### Plot regression line -----
-ggplot() +
-  geom_line(aes(x = Price.c, y = preds), color = 'red', df) +
-  geom_point(aes(x = Price.c, y = Quantity), df) +
-    labs(
-    x = "Change from Starting Price \n (U.S. Dollars)",
-    y = "Quantity Sold \n (hundreds)"
-  ) 
+mod.allison = 
+  coxph(Surv(week, arrest) ~ fin + age + race + wexp + mar + paro + prio, 
+        data=Rossi)
+summary(mod.allison)
 ```
 
 Using the centered predictor variable, our model will now represent how change in price from product A's initial sale price affects quantity sold. Let's model it and go through the most important parts of the results. 
@@ -83,19 +72,13 @@ cints
 ## Interpretation
 
 #### Intercept
-
 * When the price is $2.75, the predicted quantity sold is `r abs(mod1.summ$coefficients[[1]])` (hundred) units
-
-* If we were to repeatedly replicate this experiment under identical conditions, there is a 95% chance that a price of $2.75 would result in sale quantities of between `r cints['(Intercept)',][1]` and `r cints['(Intercept)',][2]` (hundred) units
+* If we were to replicate this experiment under identical conditions, there is a 95% chance that the change in quantity sold for increasing pricing by an additional dollar would be between `r cints['(Intercept)',][1]` and `r cints['(Intercept)',][2]`
 
 #### Price
-
-* Price is a statistically significant predictor of quantity sold (<i>p</i> < .001)
-
-* For every dollar that the price increases, the quantity sold is expected to drop by `r abs(mod1.summ$coefficients[[2]])` (hundred) units
-
-* If we repeatedly replicated this experiment, there is a 95% chance that the change in quantity sold for increasing pricing by an additional dollar would be between `r cints['Price.c',][1]` and `r cints['Price.c',][2]`
+* Price is a statistically significant predictor of quantity sold (p < .001)
+* For every dollar that the price increases from our $2.75 starting point, the quantity sold is expected to drop by `r abs(mod1.summ$coefficients[[1]])` (hundred) units
+* If we replicated this experiment, there is a 95% chance that the change in quantity sold for increasing pricing by an additional dollar would be between `r cints['Price.c',][1]` and `r cints['Price.c',][2]`
 
 #### Model
-
 * Our full model explains about 48% of the variance in the quantity sold

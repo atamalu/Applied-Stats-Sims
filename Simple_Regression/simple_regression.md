@@ -120,21 +120,22 @@ cints
 
   - When the price is $2.75, the predicted quantity sold is 1.883
     (hundred) units
-  - If we were to replicate this experiment under identical conditions,
-    there is a 95% chance that the change in quantity sold for
-    increasing pricing by an additional dollar would be between 1.597
-    and 2.168
+
+  - If we were to repeatedly replicate this experiment under identical
+    conditions, there is a 95% chance that a price of $2.75 would result
+    in sale quantities of between 1.597 and 2.168 (hundred) units
 
 #### Price
 
-  - Price is a statistically significant predictor of quantity sold (p
-    \< .001)
-  - For every dollar that the price increases from our $2.75 starting
-    point, the quantity sold is expected to drop by 1.883 (hundred)
-    units
-  - If we replicated this experiment, there is a 95% chance that the
-    change in quantity sold for increasing pricing by an additional
-    dollar would be between -2.294 and -0.977
+  - Price is a statistically significant predictor of quantity sold
+    (<i>p</i> \< .001)
+
+  - For every dollar that the price increases, the quantity sold is
+    expected to drop by 1.635 (hundred) units
+
+  - If we repeatedly replicated this experiment, there is a 95% chance
+    that the change in quantity sold for increasing pricing by an
+    additional dollar would be between -2.294 and -0.977
 
 #### Model
 

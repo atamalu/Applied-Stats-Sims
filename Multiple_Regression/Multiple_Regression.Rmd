@@ -7,7 +7,22 @@ output:
 ---
 
 ## Study
-Giovani is a local Italian food restaurant owner looking for ideal cities in Colorado to expand his business to. Before designing a complex model, he wants to get a general idea of consumer spending based on some rough preliminary data. Giovani believes that he could get a decent estimate by controlling for 
+
+Last year, Brielle's company released a single-serving drink that facilitates weight loss. To measure the effectiveness of the product, the company invites website visitors at random to give a number of their total weight loss. From a pre-release controlled pilot study, Brielle found evidence that gender and height may influence weight loss, so the survey also asked for those pieces of information. 
+
+Brielle is also interested in knowing how these self-report weights match up to the differences in weights during the company's pilot experiment. She believes that the difference in these study results can provide an idea of potential descrepancies in generalizaing the controlled experiment (holding other factors still such as diet, exercise, daily activities, etc.) to a real-world setting. 
+
+## Data simulation
+
+```{r}
+
+```
+
+
+## Why this model?
+We want to use multiple regression here for a few reasons:
+
+* 
 
 ```{r}
 set.seed(150)
