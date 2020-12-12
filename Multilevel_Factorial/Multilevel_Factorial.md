@@ -3,6 +3,9 @@ Multilevel Model (factorial)
 
 ## Study
 
+(this study is based on a real pilot study I did graphing and analysis
+for, but with different results)
+
 A behavioral neuroscience lab that studies learned helplessness is
 testing a new technology that measures calcium activity in the brain.
 One previous study tested the effect of exercise on activity in the
@@ -41,6 +44,7 @@ in this case:
   - Due to individual differences in stress resilience and overall
     neurobiology, we at least assume that we should give each subject
     their own intercept
+
   - Also because of individual differences in stress resilience, the
     rate at which the DV changes across trials in response to stress may
     differ from subject to subject (assuming that it does change across
@@ -140,7 +144,6 @@ names(multi.sims) <- rep(c('IV', 'AUC', 'Trial', 'Subject.num'), 4)
 group.names <- paste(df$Group, df$Sex) # add group names
 
 ### Move into separate data frames and label
-
 sed.male <- do.call(cbind, multi.sims[2:4]) %>%
   as.data.frame() %>%
   mutate(Group = 'Sedentary', Sex = 'Male')
@@ -169,14 +172,14 @@ df <- df %>%
 glimpse(df)
 ```
 
-    ## Observations: 1,440
-    ## Variables: 5
+    ## Rows: 1,440
+    ## Columns: 5
     ## Groups: Group, Sex, Subject.num [48]
-    ## $ AUC         <dbl> -1.704, 4.019, 3.106, 1.728, 2.072, 2.018, 0.649, ...
-    ## $ Trial       <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-    ## $ Subject.num <dbl> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4,...
-    ## $ Group       <chr> "Sedentary", "Sedentary", "Sedentary", "Sedentary"...
-    ## $ Sex         <chr> "Male", "Male", "Male", "Male", "Male", "Male", "M...
+    ## $ AUC         <dbl> -1.704, 4.019, 3.106, 1.728, 2.072, 2.018, 0.649, 0.793...
+    ## $ Trial       <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+    ## $ Subject.num <dbl> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6...
+    ## $ Group       <chr> "Sedentary", "Sedentary", "Sedentary", "Sedentary", "Se...
+    ## $ Sex         <chr> "Male", "Male", "Male", "Male", "Male", "Male", "Male",...
 
 Now we have our data set. Each combination of group and sex (IV’s) has
 10 subjects; with an AUC (DV) value for each of the 30 trials.
@@ -337,9 +340,11 @@ manner.
 The last step of preparation is constructing the contrast codes.
 Specifically, we want to know:
 
-  - Is there an effect of sex on AUC? <BR>
-  - Is there an effect of exercise on AUC? <BR>
-  - Does the effect of exercise depend on the subject’s sex? <BR>
+  - Is there an effect of sex on AUC?
+
+  - Is there an effect of exercise on AUC?
+
+  - Does the effect of exercise depend on the subject’s sex?
 
 <!-- end list -->
 
@@ -355,9 +360,12 @@ df$sex.con <- ifelse(df$Sex == 'Male', -0.5, 0.5)
 To construct our model, we begin at a random intercept model by
 including the following: <BR>
 
-  - 1 DV… `AUC` <BR>
-  - 2 IV’s… `Group + Sex` <BR>
-  - A Group-Sex interaction… `Group:Sex` <BR>
+  - 1 DV… `AUC`
+
+  - 2 IV’s… `Group + Sex`
+
+  - A Group-Sex interaction… `Group:Sex`
+
   - A random intercept for each subject `(1 | Subject)` <BR> <BR>
 
 We also use ML instead of REML for estimation to measure the effects of
@@ -372,8 +380,8 @@ mod1 <- lmer(AUC ~ (1 | Subject) + group.con + sex.con + group.con:sex.con, data
 print(summary(mod1))
 ```
 
-    ## Linear mixed model fit by maximum likelihood . t-tests use
-    ##   Satterthwaite's method [lmerModLmerTest]
+    ## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's
+    ##   method [lmerModLmerTest]
     ## Formula: AUC ~ (1 | Subject) + group.con + sex.con + group.con:sex.con
     ##    Data: df
     ## Control: lmer.opts
@@ -1205,9 +1213,11 @@ CI\_upper
 
   - The effect of exercise on AUC does not depend on the Sex of the
     subject, with the coefficient estimate being 0.353 (p = 0.641)
+    
       - Based on the data, if we were to repeat the experiment there is
         a 95% chance that the coefficient estimate would be between
         -1.123 and 1.83
+
   - The non-significance of a Group x Sex interaction is further
     supported by the fact that all effect sizes explain less than .001%
     of the variance in AUC’s
@@ -1542,19 +1552,26 @@ CI\_upper
   - After controlling for overall individual differences and Group, the
     mean AUC for male subjects is 7.552 lower than female subjects (p \<
     0.001)
+    
       - If we were to repeat the experiment, there is a 95% chance that
         the mean difference between sexes would be between 6.812 and
         8.292
+
   - The significance of exercise treatment is further supported by the
     interesting effect sizes:
+    
       - The percent of variance in AUC’s explained by individual
         differences alone decreases by 32.2%
+    
       - After controlling for Group and Sex, individual differences
         explain about 83.5% less variance than when Sex is added to the
         model with a Group covariate
+    
       - Therefore, the percent of variance in individual differences
         accounted for by Sex is 51.3%
+    
       - Sex by itself explains 83.5% of variance in AUC’s
+        
           - which is about % of the variance explained by individual
             differences
 
@@ -1565,6 +1582,7 @@ from pre-trial baseline, as a result of uncontrollable stress.
 
 ``` r
 mod.comps <- as.data.frame(mod.comps)
+
 ##### Create labels --------------
 comp.labs <- c('Group x Sex',
                'Exercise - Sedentary',
@@ -1595,7 +1613,7 @@ difference between those 2 group means would be within that range.
 
 ``` r
 ##### Plot --------------
-results.plot <- ggplot(mod.comps) +
+ggplot(mod.comps) +
   geom_point(aes(x = Comp.labs, y = Est)) +
   geom_errorbar(aes(x = Comp.labs,
                     ymin = CI_lower,
@@ -1608,8 +1626,6 @@ results.plot <- ggplot(mod.comps) +
     title = 'Contrasts of Mean Differences',
     subtitle = 'with 95% confidence intervals') +
   labs.theme
-
-results.plot
 ```
 
 ![](Figures/unnamed-chunk-19-1.png)<!-- -->

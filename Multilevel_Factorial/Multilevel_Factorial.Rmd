@@ -14,6 +14,8 @@ options(digits = 3,
 
 ## Study
 
+(this study is based on a real pilot study I did graphing and analysis for, but with different results)
+
 A behavioral neuroscience lab that studies learned helplessness is testing a new technology that measures calcium activity in the brain. One previous study tested the effect of exercise on activity in the medial prefrontal cortex (mPFC) in response to an uncontrollable stressor. However, this study only included male subjects. The present lab has previously discovered that neural activity in the mPFC resulting from stressful situations is different between male and female rats. One researcher decides to test if exercise will alter aggregate calcium levels in this region and affect how the mPFC reacts to uncontrollable stress.
 
 For 6 weeks beforehand, an experimental group (exercise) is given a wheel to run on in their cage. A control group (sedentary) is also given a wheel to run on for this time period, but it is locked and therefore non-functional. The researcher also includes subjects of both sexes. To connect behavior and neural activity during the experiment, calcium activity is continuously recorded before and through 30 trials of inescapable shock (IS); in which the subject does not have behavioral control over the stressor. 
@@ -25,6 +27,7 @@ The data is first centered at a pre-trial baseline period, then aggregated to re
 The reasoning behind using a multilevel model is pretty straightforward in this case:
 
 * Due to individual differences in stress resilience and overall neurobiology, we at least assume that we should give each subject their own intercept
+
 * Also because of individual differences in stress resilience, the rate at which the DV changes across trials in response to stress may differ from subject to subject (assuming that it does change across trials). So we see if allowing a random slope for Trial will significantly improve the model
 
 <details><summary>(details)</summary>
@@ -40,7 +43,7 @@ For example: instead of simply saying that a grouping variable explains 32% of v
 
 ### Packages/functions
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(kableExtra) # table options
 library(dplyr) # data manipulation
 library(psych) # some analytics
@@ -92,7 +95,6 @@ names(multi.sims) <- rep(c('IV', 'AUC', 'Trial', 'Subject.num'), 4)
 group.names <- paste(df$Group, df$Sex) # add group names
 
 ### Move into separate data frames and label
-
 sed.male <- do.call(cbind, multi.sims[2:4]) %>%
   as.data.frame() %>%
   mutate(Group = 'Sedentary', Sex = 'Male')
@@ -220,9 +222,11 @@ There is no specific trend across trials that is noticeable in any group. This i
 
 The last step of preparation is constructing the contrast codes. Specifically, we want to know:
 
-* Is there an effect of sex on AUC? <BR>
-* Is there an effect of exercise on AUC? <BR>
-* Does the effect of exercise depend on the subject's sex? <BR>
+* Is there an effect of sex on AUC? 
+
+* Is there an effect of exercise on AUC? 
+
+* Does the effect of exercise depend on the subject's sex? 
 
 ```{r}
 df$group.con <- ifelse(df$Group == 'Sedentary', -0.5, 0.5)
@@ -235,9 +239,12 @@ df$sex.con <- ifelse(df$Sex == 'Male', -0.5, 0.5)
 
 To construct our model, we begin at a random intercept model by including the following: <BR>
 
-* 1 DV... `AUC` <BR>
-* 2 IV's... `Group + Sex` <BR>
-* A Group-Sex interaction... `Group:Sex` <BR>
+* 1 DV... `AUC` 
+
+* 2 IV's... `Group + Sex` 
+
+* A Group-Sex interaction... `Group:Sex` 
+
 * A random intercept for each subject `(1 | Subject)` <BR> <BR>
 
 We also use ML instead of REML for estimation to measure the effects of our individual parameters by using model comparison.
@@ -367,7 +374,9 @@ kable(int.comp)
 ```
 
 * The effect of exercise on AUC does not depend on the Sex of the subject, with the coefficient estimate being `r int.comp['Est']` (p = `r int.comp['p']`)
+
   * Based on the data, if we were to repeat the experiment there is a 95% chance that the coefficient estimate would be between `r int.comp['CI_lower']` and `r int.comp['CI_upper']`
+  
 * The non-significance of a Group x Sex interaction is further supported by the fact that all effect sizes explain less than .001% of the variance in AUC's
 
 #### Main Effects
@@ -403,12 +412,18 @@ kable(sex.comp)
 ```
 
 * After controlling for overall individual differences and Group, the mean AUC for male subjects is `r sex.comp['Est']` lower than female subjects (p < `r 0.001`)
+
   * If we were to repeat the experiment, there is a 95% chance that the mean difference between sexes would be between `r sex.comp['CI_lower']` and `r sex.comp['CI_upper']`
+
 * The significance of exercise treatment is further supported by the interesting effect sizes:
   * The percent of variance in AUC's explained by individual differences alone decreases by `r abs(sex.comp['ICC.adj']*100)`%
+
   * After controlling for Group and Sex, individual differences explain about `r abs(sex.comp['ICC.cond']*100)`% less variance than when Sex is added to the model with a Group covariate
+  
   * Therefore, the percent of variance in individual differences accounted for by Sex is `r abs(sex.comp['ICC.AminusC']*100)`%
+
   * Sex by itself explains `r abs(sex.comp['R2.marg']*100)`% of variance in AUC's
+  
     * which is about `r (abs(sex.comp['R2.marg']) / abs(sex.comp['R2.cond']))*100`% of the variance explained by individual differences
 
 A subject's sex is a significant predictor of change in mPFC activity from pre-trial baseline, as a result of uncontrollable stress.
@@ -417,6 +432,7 @@ A subject's sex is a significant predictor of change in mPFC activity from pre-t
  
 ```{r}
 mod.comps <- as.data.frame(mod.comps)
+
 ##### Create labels --------------
 comp.labs <- c('Group x Sex',
                'Exercise - Sedentary',
@@ -447,7 +463,7 @@ labs.theme <- theme(
 
 ```{r}
 ##### Plot --------------
-results.plot <- ggplot(mod.comps) +
+ggplot(mod.comps) +
   geom_point(aes(x = Comp.labs, y = Est)) +
   geom_errorbar(aes(x = Comp.labs,
                     ymin = CI_lower,
@@ -460,8 +476,6 @@ results.plot <- ggplot(mod.comps) +
     title = 'Contrasts of Mean Differences',
     subtitle = 'with 95% confidence intervals') +
   labs.theme
-
-results.plot
 ```
 
 Last, we visualize how close each subject's predicted value from our model is to their actual values across trials. This can be easily done by using a similar graph across trials from earlier. Each red line represents the predicted AUC for the respective subject, which does not change across trials. 
