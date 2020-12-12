@@ -71,7 +71,7 @@ source('Functions multilevel 1.R')
 
 We generate our data using approximate means and standard deviations from the actual experiment. 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 ##### Summary stats from small n study ---------------
 df <- data.frame(
   Group = c('Sedentary', 'Sedentary', 'Exercise', 'Exercise'),
@@ -135,7 +135,7 @@ Bar graphs are a very basic and ubiquitous way of displaying categorical predict
 </p></details>
 <BR>
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 ##### Summarize ---------------
 df.summ1 <- df %>%
   group_by(Group, Sex) %>%
@@ -172,7 +172,7 @@ The graph itself - a box plot - shows the minimum, 25th percentile, median, 75th
 </p></details>
 <BR>
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 grps.ordered <- c('Sedentary Female', 'Exercise Female', 'Sedentary Male', 'Exercise Male')
 
 ##### Summarize ---------------
@@ -200,7 +200,7 @@ We can use facets to conveniently view subjects along all trials. Viewing them i
 </p></details>
 <BR>
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 ##### New labels ---------------
 df$Group2 <- paste(df$Group, df$Sex)
 df.sub <- df[df$Subject.num %in% c(1:4),]
